@@ -1,0 +1,25 @@
+#!/sbin/openrc-run
+name="tomcat"
+description="Apache Tomcat server"
+command="/bin/bash"
+command_args=" "
+pidfile="/var/run/tomcat/tomcat.pid"
+command_user="tomcat"
+
+depend() {
+        need net
+}
+
+start_pre() {
+    ebegin "Starting ${SVCNAME}"
+    command_args="$command_args /usr/share/tomcat/bin/startup.sh"
+    eend $?
+}
+
+stop_post() {
+    ebegin "Stopping ${SVCNAME}"
+    command_args="$command_args /usr/share/tomcat/bin/shutdown.sh"
+    sleep 5
+    eend $?
+}
+

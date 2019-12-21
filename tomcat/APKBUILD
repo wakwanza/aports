@@ -1,0 +1,51 @@
+# Contributor: wakwanza <wakwanza@users.noreply.github.com>
+# Maintainer: wakwanza <wakwanza@users.noreply.github.com>
+pkgname="tomcat"
+pkgver="9.0.27"
+pkgrel=0
+pkgdesc="Apache Servlet/JSP Engine, RI for Servlet 2.4/JSP 2.0 API - Apache Tomcat"
+url="http://tomcat.apache.org/"
+arch="noarch"
+license="Apache-2.0"
+depends="bash"
+pkgusers="$pkgname"
+pkggroups="$pkgname"
+provides="apache-tomcat=9"
+makedepends=""
+install="$pkgname.pre-install"
+subpackages=""
+source="
+        https://s3.amazonaws.com/infra.saaspass.com/tgz/apache-$pkgname-$pkgver.tar.gz
+	    tomcat.initd
+	    tomcat.confd
+        tomcat.logrotate
+	"
+options="!check"
+builddir="$srcdir/apache-$pkgname-$pkgver"
+
+build() {
+        :
+        rm -f "$builddir"/bin/*.bat
+        rm -rf "$builddir"/webapps/*
+        rm -rf "$builddir"/logs
+}
+
+package() {
+        : 
+        cd "$builddir"
+	    install -m755 -D "$srcdir"/$pkgname.initd "$pkgdir"/etc/init.d/$pkgname
+	    install -m644 -D "$srcdir"/$pkgname.confd "$pkgdir"/etc/conf.d/$pkgname
+        install -m644 -D "$srcdir"/$pkgname.logrotate "$pkgdir"/etc/logrotate.d/$pkgname
+        mkdir -p  "$pkgdir"/usr/share/$pkgname
+        mkdir -p "$pkgdir"/var/run/$pkgname
+        cp -R "$builddir"/* "$pkgdir"/usr/share/$pkgname/
+        mkdir -p "$pkgdir"/var/log/$pkgname
+        ln -s /var/log/$pkgname "$pkgdir"/usr/share/$pkgname/logs
+        chown -R $pkgusers:$pkggroups "$pkgdir"/var/log/tomcat
+        chown -R $pkgusers:$pkggroups "$pkgdir"/var/run/tomcat
+        chown -R $pkgusers:$pkggroups "$pkgdir"/usr/share/tomcat
+}
+sha512sums="408d30bf56d59941149b397e5e725a5f9baf225807397a4b7a3be79f7d211e6d878d34bf00776746a54cc7d067f168db24c367e5c7390bb7329b3bca428726cc  apache-tomcat-9.0.27.tar.gz
+495c7055c398016333d9807203547d46eb4d217681143966c1214e1d52c9e7e113743e48fbb416c321699e077d1077cefb8427f99bbf2ea2430badd23e688cc4  tomcat.initd
+b8c5fe36f51580362ab71a3c49162b856c40f226ccc0c15827cf66bf92b08de5f2c4ef3fdc95a3fc5bcdaef47af18bea0c3fba66828f8715688db9a67ddd2a88  tomcat.confd
+fa83b2af0145767ab1c37719c29d933f254ee5b1f2a534b2e0984acf7e838fb66f8b56a3c4c3bd2b0f2d26dc42e4847acdb3ad8dd715f7a23fe0f67d53cc6147  tomcat.logrotate"

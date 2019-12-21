@@ -1,0 +1,9 @@
+/var/log/tomcat/catalina.out {
+    copytruncate
+    compress
+    daily
+    rotate 7
+    notifempty
+    missingok
+}
+
